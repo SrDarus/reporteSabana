@@ -1,0 +1,20 @@
+ul{
+	list-style-type: none;
+	background-color: #333333;
+}
+
+li{
+	float: left;
+	display: block;
+	margin-right: 10%;
+}
+
+a {
+	color: #020F18;
+}
+
+footer{
+	background: linear-gradient(45deg, #7FB400, #003D70);
+	/*20vh = 20 % de la pantalla*/
+	max-height: 20vh;
+}

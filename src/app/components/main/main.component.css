@@ -1,0 +1,176 @@
+
+input, button {
+  color: #62A8D1;
+	border-radius: 5px;
+}
+
+select{
+  border-radius: 5px;
+}
+
+input[type=checkbox] + label {
+  font-style: italic;
+}
+
+input[type=checkbox]:checked + label {
+  color: #f00;
+  font-style: normal;
+} 
+
+select, input[type=date], input[type=text]{
+  background-color: #ffffff;
+}
+
+.txtsChanges:hover{
+  background-color: #ffffff;
+}
+
+.txtsChanges:focus{
+  background-color: #ffffff;
+}
+
+.loading {
+  position: fixed;
+  z-index: 999;
+  height: 10em;
+  width: 10em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: none;
+}
+
+.btn-raised{
+	margin-left: 5%;
+}
+
+#txtAdvertencia{
+  position: absolute;
+  font-size: 15px;
+  margin-top: 1px;
+  color: #CF4242;
+  float: left;
+  margin-left: 35%;
+}
+
+thead th {
+  cursor: pointer;
+  margin-right: 15px;
+  margin-left: 15px;
+
+  span {
+    visibility: hidden;
+  }
+
+  &.active {
+    color: #000;
+
+    span {
+      visibility: visible;
+    }
+  }
+}
+
+
+.btnColumnas{
+ width: 100px;
+}
+
+.header{
+  border-radius: 5px;
+  background-color: #70A8D3;
+  margin-top: 2px;
+}
+
+.gridSabanat{
+    background-color: lightgoldenrodyellow;
+}
+
+.lbHead{
+  color: #1D5994;
+}
+
+.btnsMain{
+  width: 100px;
+  background-color: #E5E5E5;
+}
+
+.btnsMain:hover{
+  background-color: #D7D3D3;
+}
+
+.btnsAction{
+  width: 100px;
+  background-color: #E5E5E5;
+}
+
+.btnsAction:hover{
+  background-color: #D7D3D3;
+}
+
+.btnsMain:focus{
+  color: #ffffff;
+  background-color: #BDBDBD;
+}
+
+.btnsTipoReporte{
+  margin-top: 1px;
+  border-radius: 5px;
+  color: #62A8D1;
+  background-color: #E5E5E5;
+}
+
+.btnsTipoReporte:hover{
+  background-color: #D7D3D3;
+}
+
+.btnsTipoReporte:focus{
+  color: #62A8D1;
+  background-color: #E5E5E5;
+}
+
+
+
+.btnColumnInit{
+  background-color: #E5E5E5;
+  color:#62A8D1;
+}
+
+.btnColumnPress{
+  color: #ffffff;
+  background-color: #BDBDBD;
+}
+
+.btnFiltroInit{
+  background-color: #E5E5E5;
+  color:#62A8D1;
+}
+
+.btnFiltroPress{
+  color: #ffffff;
+  background-color: #BDBDBD;
+}
+
+.btnAgruparInit{
+  background-color: #E5E5E5;
+  color:#62A8D1;
+}
+
+.btnAgruparPress{
+  color: #ffffff;
+  background-color: #BDBDBD;
+}
+
+.btnGrillaInit{
+  background-color: #E5E5E5;
+  color:#62A8D1;
+}
+
+.btnGrillaPress{
+  color: #ffffff;
+  background-color: #BDBDBD;
+}
+

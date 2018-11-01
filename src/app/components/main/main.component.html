@@ -1,0 +1,1572 @@
+<!--GIF LOAD-->
+  <!--img id="imgLoad" class="loading" *ngIf="actionLoad" src="/ReporteSabana/filtroColumnas/assets/img/loadNormal.gif" alt=""-->
+  <img #gif class="loading"  src="/assets/img/loadNormal.gif" alt="">
+<!--FIN GIF LOAD-->
+
+<!---->
+<div class="row" *ngIf="actionAdvertencia">
+  <div class="col-12">
+    <b><label id="txtAdvertencia" >{{txtAdvertencia}}</label></b>
+  </div>
+</div>
+<!---->
+
+<!--OPCIONES-->
+<div class="container header">
+  <!--FILTROS DE BUSQUEDA-->
+  <div class="row" style="margin-top: 15px">
+    <div class="col-12 text-center">
+
+      <div class="btn-group" role="group" aria-label="Busqueda">
+        <!--label  for="cbGetConfig" style="margin-right: 2px">Reporte</label-->
+        <select  class="custom-select mr-sm-2" name="cbGetConfig" id="cbGetConfig" [(ngModel)]="cbReportSelected" (ngModelChange)="getConfig()" placeholder="Reportes">
+          <option [ngValue]="0"> Nuevo Reporte</option>
+          <option [ngValue]="tipoDB"  *ngFor="let tipoDB of cbTipoDB">
+            {{tipoDB.nombre}}
+          </option>
+        </select>
+        <input class="btn btn-outline-secondary txtsChanges" [(ngModel)]="txtFechaInicio" type="date">
+        <input class="btn btn-outline-secondary txtsChanges" [(ngModel)]="txtFechaFin" type="date">
+      </div>
+
+
+      <div class="btn-group" role="group" aria-label="Actiones">
+        <button class="btn btn-outline-primary btnsMain" (click)="getTabla()"><i class="fa fa-search icon-large"></i> <b> Procesar</b></button>
+        <button class="float-right btn btn-outline-primary btnsMain" (click)="exportCSV()"><i class="fa fa-download"></i> <b> Exportar</b></button>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <!--MOSTRAR/OCULTAR COLUMNAS-->
+  <div class="row">
+    <div class="col-12 text-center">
+      <div class="btn-group" role="group" aria-label="btnAcordeones">
+        <!--btn mostrar ocultar columnas-->
+        <p class="btn-group" role="group">
+          <button 
+          class="btn btn-raised btnsAction" 
+          [ngClass]="{'btnColumnInit': btnColumnaInit, 'btnColumnPress': btnColumnaPress}" 
+          type="button"
+          data-toggle="collapse"
+          data-target="#collapseOcultarColumanas"
+          aria-expanded=" false"
+          aria-controls="collapseOcultarColumanas"
+          (click)="changeClassExpand('columns')">
+            <b>Columnas</b>
+          </button>
+        </p>
+        <!--btn filtro Columnas-->
+        <p class="btn-group" role="group">
+          <button 
+          class="btn btn-raised btnsAction"
+          [ngClass]="{'btnFiltroInit': btnFiltroInit, 'btnFiltroPress': btnFiltroPress}" 
+          type="button" data-toggle="collapse" 
+          data-target="#collapseFiltros" aria-expanded=" false" 
+          aria-controls="collapseFiltros"
+          (click)="changeClassExpand('filtro')">
+            <b>FILTROS</b>
+          </button>
+        </p>
+        <!--btn filtro por agrupacion-->
+        <p class="btn-group" role="group">
+          <button 
+          [ngClass]="{'btnAgruparInit': btnAgruparInit, 'btnAgruparPress': btnAgruparPress}" 
+          class="btn btn-raised btnsAction" 
+          type="button" data-toggle="collapse" 
+          data-target="#collapseAgrupacion" 
+          aria-expanded="false" 
+          aria-controls="collapseAgrupacion"
+          (click)="changeClassExpand('agrupar')">
+            <b>Agrupar</b>
+          </button>
+        </p>
+        <!--btn grilla-->
+         <p class="btn-group" role="group">
+           <button 
+          [ngClass]="{'btnGrillaInit': btnGrillaInit, 'btnGrillaPress': btnGrillaPress}" 
+           class="btn btn-raised btnsAction" 
+           type="button" 
+          (click)="changeClassExpand('grilla'); changeExpande()">
+             <b> Grilla</b>
+           </button>
+         </p>
+      </div>
+    </div>
+  </div>
+
+  <!--GUARDAR/CLONAR/ELIMINAR REPORTE-->
+  <div class="row">
+    <div class="col-12 text-center">
+
+
+      <div class="btn-group" role="group" aria-label="guardarReporte">
+        <input class="btn btn-outline-secondary txtsChanges" [(ngModel)]="txtNombreReporte" type="text">
+        <button class="float-right  btn btn-outline-secondary btnsTipoReporte " (click)="saveReport()"><b>Guardar reporte</b></button>
+      </div>
+
+      <div class="btn-group" role="group" aria-label="clonarReporte">
+        <input class="btn btn-outline-secondary txtsChanges" [(ngModel)]="txtNombreClonar" type="text">
+        <button class="float-right  btn btn-outline-secondary btnsTipoReporte " (click)="saveClonar()"><b>Clonar reporte</b></button>
+      </div>
+
+      <div class="btn-group" aria-label="eliminarReporte">
+        <button class="btn btn-outline-secondary btnsTipoReporte"  (click)="deleteTipoReporte()"><b>Eliminar</b></button>
+      </div>
+        <input type="hidden" #closeAddDeleteModal data-toggle="modal" data-target="#modalAdvertencia">
+
+    </div>
+  </div>
+</div>
+<!--FIN OPCIONES-->
+
+<hr>
+
+<!--MOSTRAR OCULTAR COLUNAS COLUMNAS-->
+<div class="collapse" id="collapseOcultarColumanas" >
+  <div class="card card-body" >
+    <table>
+      <tr>
+        <td><input id="checkTodos" type="checkbox" (change)="all()" [(ngModel)]="actionTodos"><label for="checkTodos">Todos</label></td>
+        <td><input id="checkAhorro" type="checkbox" [(ngModel)]="config.actions.actionAhorro"><label for="checkAhorro">Ahorro</label></td>
+        <td><input id="checkAnticipacion" type="checkbox" [(ngModel)]="config.actions.actionAnticipacion"><label for="checkAnticipacion">Anticipacion</label></td>
+        <td><input id="checkAuditor" type="checkbox" [(ngModel)]="config.actions.actionAuditor"><label for="checkAuditor">Auditor</label></td>
+        <td><input id="checkBooking" type="checkbox" [(ngModel)]="config.actions.actionBooking"><label for="checkBooking">Booking</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkBspComisionPorcentaje" type="checkbox" [(ngModel)]="config.actions.actionBspComisionPorcentaje"><label for="checkBspComisionPorcentaje">BspComisionPorcentaje</label></td>
+        <td><input id="checkBspMontoComision" type="checkbox" [(ngModel)]="config.actions.actionBspMontoComision"><label for="checkBspMontoComision">BspMontoComision</label></td>
+        <td><input id="checkBspMontoContado" type="checkbox" [(ngModel)]="config.actions.actionBspMontoContado"><label for="checkBspMontoContado">BspMontoContado</label></td>
+        <td><input id="checkBspMontoCredito" type="checkbox" [(ngModel)]="config.actions.actionBspMontoCredito"><label for="checkBspMontoCredito">BspMontoCredito</label></td>
+        <td><input id="checkBspMontoOver" type="checkbox" [(ngModel)]="config.actions.actionBspMontoOver"><label for="checkBspMontoOver">BspMontoOver</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkBspMontoTotal" type="checkbox" [(ngModel)]="config.actions.actionBspMontoTotal"><label for="checkBspMontoTotal">BspMontoTotal</label></td>
+        <td><input id="checkBspNetoAPagar" type="checkbox" [(ngModel)]="config.actions.actionBspNetoAPagar"><label for="checkBspNetoAPagar">BspNetoAPagar</label></td>
+        <td><input id="checkBspOverPorcentaje" type="checkbox" [(ngModel)]="config.actions.actionBspOverPorcentaje"><label for="checkBspOverPorcentaje">BspOverPorcentaje</label></td>
+        <td><input id="checkCerrado" type="checkbox" [(ngModel)]="config.actions.actionCerrado"><label for="checkCerrado">Cerrado</label></td>
+        <td><input id="checkCiudadDestino" type="checkbox" [(ngModel)]="config.actions.actionCiudadDestino"><label for="checkCiudadDestino">CiudadDestino</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkCiudadOrigen" type="checkbox" [(ngModel)]="config.actions.actionCiudadOrigen"><label for="checkCiudadOrigen">CiudadOrigen</label></td>
+        <td><input id="checkClases" type="checkbox" [(ngModel)]="config.actions.actionClases"><label for="checkClases">Clases</label></td>
+        <td><input id="checkCliente" type="checkbox" [(ngModel)]="config.actions.actionCliente"><label for="checkCliente">Cliente</label></td>
+        <td><input id="checkCodigoIT" type="checkbox" [(ngModel)]="config.actions.actionCodigoIT"><label for="checkCodigoIT">CodigoIt</label></td>
+        <td><input id="checkComision" type="checkbox" [(ngModel)]="config.actions.actionComision"><label for="checkComision">Comision</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkComisionCLP" type="checkbox" [(ngModel)]="config.actions.actionComisionCLP"><label for="checkComisionCLP">ComisionCLP</label></td>
+        <td><input id="checkComisionIva" type="checkbox" [(ngModel)]="config.actions.actionComisionIva"><label for="checkComisionIva">ComisionIva</label></td>
+        <td><input id="checkComisionIvaCLP" type="checkbox" [(ngModel)]="config.actions.actionComisionIvaCLP"><label for="checkComisionIvaCLP">ComisionIvaCLP</label></td>
+        <td><input id="checkComisionIvaUSD" type="checkbox" [(ngModel)]="config.actions.actionComisionIvaUSD"><label for="checkComisionIvaUSD">ComisionIvaUSD</label></td>
+        <td><input id="checkComisionUSD" type="checkbox" [(ngModel)]="config.actions.actionComisionUSD"><label for="checkComisionUSD">ComisionUSD</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkDescuento" type="checkbox" [(ngModel)]="config.actions.actionDescuento"><label for="checkDescuento">Descuento</label></td>
+        <td><input id="checkDescuentoCLP" type="checkbox" [(ngModel)]="config.actions.actionDescuentoCLP"><label for="checkDescuentoCLP">DescuentoCLP</label></td>
+        <td><input id="checkDescuentoUSD" type="checkbox" [(ngModel)]="config.actions.actionDescuentoUSD"><label for="checkDescuentoUSD">DescuentoUSD</label></td>
+        <td><input id="checkEstadoLinea" type="checkbox" [(ngModel)]="config.actions.actionEstadoLinea"><label for="checkEstadoLinea">EstadoLinea</label></td>
+        <td><input id="checkEstadoNegocio" type="checkbox" [(ngModel)]="config.actions.actionEstadoNegocio"><label for="checkEstadoNegocio">EstadoNegocio</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkFareBasis" type="checkbox" [(ngModel)]="config.actions.actionFareBasis"><label for="checkFareBasis">FareBasis</label></td>
+        <td><input id="checkFechaCreacion" type="checkbox" [(ngModel)]="config.actions.actionFechaCreacion"><label for="checkFechaCreacion">FechaCreacion</label></td>
+        <td><input id="checkFechaEmision" type="checkbox" [(ngModel)]="config.actions.actionFechaEmision"><label for="checkFechaEmision">FechaEmision</label></td>
+        <td><input id="checkFechaFacturaLinea" type="checkbox" [(ngModel)]="config.actions.actionFechaFacturaLinea"><label for="checkFechaFacturaLinea">FechaFacturaLinea</label></td>
+        <td><input id="checkFechaRegreso" type="checkbox" [(ngModel)]="config.actions.actionFechaRegreso"><label for="checkFechaRegreso">FechaRegreso</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkFechaSalida" type="checkbox" [(ngModel)]="config.actions.actionFechaSalida"><label for="checkFechaSalida">FechaSalida</label></td>
+        <td><input id="checkFechaViajeDesde" type="checkbox" [(ngModel)]="config.actions.actionFechaViajeDesde"><label for="checkFechaViajeDesde">FechaViajeDesde</label></td>
+        <td><input id="checkFechaViajeHasta" type="checkbox" [(ngModel)]="config.actions.actionFechaViajeHasta"><label for="checkFechaViajeHasta">FechaViajeHasta</label></td>
+        <td><input id="checkHoraSalida" type="checkbox" [(ngModel)]="config.actions.actionHoraSalida"><label for="checkHoraSalida">HoraSalida</label></td>
+        <td><input id="checkIata" type="checkbox" [(ngModel)]="config.actions.actionIata"><label for="checkIata">Iata</label></td>
+      </tr>
+      <tr>
+        <!--Inicio No existen-->
+        <td><input id="checkIdClieCliente" type="checkbox" [(ngModel)]="config.actions.actionIdClieCliente"><label for="checkIdClieCliente">IdClieCliente</label></td>
+        <td><input id="checkIdMaeSucursal" type="checkbox" [(ngModel)]="config.actions.actionIdMaeSucursal"><label for="checkIdMaeSucursal">IdMaeSucursal</label></td>
+        <td><input id="checkIdProdSubProducto" type="checkbox" [(ngModel)]="config.actions.actionIdProdSubProducto"><label for="checkIdProdSubProducto">IdProdSubProducto</label></td>
+        <td><input id="checkIdProvProveedores" type="checkbox" [(ngModel)]="config.actions.actionIdProvProveedores"><label for="checkIdProvProveedores">IdProvProveedores</label></td>
+        <td><input id="checkIdSegUsuarioCreacion" type="checkbox" [(ngModel)]="config.actions.actionIdSegUsuarioCreacion"><label for="checkIdSegUsuarioCreacion">IdSegUsuarioCreacion</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkIdVendVendedora" type="checkbox" [(ngModel)]="config.actions.actionIdVendVendedora"><label for="checkIdVendVendedora">IdVendVendedora</label></td>
+        <td><input id="checkIdVentaNegocio" type="checkbox" [(ngModel)]="config.actions.actionIdVentaNegocio"><label for="checkIdVentaNegocio">IdVentaNegocio</label></td>
+        <td><input id="checkIdVentaNegocioDetalle" type="checkbox" [(ngModel)]="config.actions.actionIdVentaNegocioDetalle"><label for="checkIdVentaNegocioDetalle">IdVentaNegocioDetalle</label></td>
+        <td><input id="checkImpuestoFacturadoLinea" type="checkbox" [(ngModel)]="config.actions.actionImpuestoFacturadoLinea"><label for="checkImpuestoFacturadoLinea">ImpuestoFacturadoLinea</label></td>
+        <!--fin no existe-->
+        <td><input id="checkInterfaz" type="checkbox" [(ngModel)]="config.actions.actionInterfaz"><label for="checkInterfaz">Interfaz</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkIva" type="checkbox" [(ngModel)]="config.actions.actionIva"><label for="checkIva">Iva</label></td>
+        <td><input id="checkIvaCLP" type="checkbox" [(ngModel)]="config.actions.actionIvaCLP"><label for="checkIvaCLP">IvaCLP</label></td>
+        <td><input id="checkIvaUSD" type="checkbox" [(ngModel)]="config.actions.actionIvaUSD"><label for="checkIvaUSD">IvaUSD</label></td>
+        <td><input id="checkLineaNegocio" type="checkbox" [(ngModel)]="config.actions.actionLineaNegocio"><label for="checkLineaNegocio">LineaNegocio</label></td>
+        <td><input id="checkMoneda" type="checkbox" [(ngModel)]="config.actions.actionMoneda"><label for="checkMoneda">Moneda</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkMontoCosto" type="checkbox" [(ngModel)]="config.actions.actionMontoCosto"><label for="checkMontoCosto">MontoCosto</label></td>
+        <td><input id="checkMontoCostoCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoCostoCLP"><label for="checkMontoCostoCLP">MontoCostoCLP</label></td>
+        <td><input id="checkMontoCostoUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoCostoUSD"><label for="checkMontoCostoUSD">MontoCostoUSD</label></td>
+        <td><input id="checkMontoDescuento" type="checkbox" [(ngModel)]="config.actions.actionMontoDescuento"><label for="checkMontoDescuento">MontoDescuento</label></td>
+        <td><input id="checkMontoDescuentoCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoDescuentoCLP"><label for="checkMontoDescuentoCLP">MontoDescuentoCLP</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkMontoDescuentoUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoDescuentoUSD"><label for="checkMontoDescuentoUSD">MontoDescuentoUSD</label></td>
+        <td><input id="checkMontoFacturadoLinea" type="checkbox" [(ngModel)]="config.actions.actionMontoFacturadoLinea"><label for="checkMontoFacturadoLinea">MontoFacturadoLinea</label></td>
+        <td><input id="checkMontoFee" type="checkbox" [(ngModel)]="config.actions.actionMontoFee"><label for="checkMontoFee">MontoFee</label></td>
+        <td><input id="checkMontoFeeCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoFeeCLP"><label for="checkMontoFeeCLP">MontoFeeCLP</label></td>
+        <!--Inicio no existe-->
+        <td><input id="checkMontoFeeOculto" type="checkbox" [(ngModel)]="config.actions.actionMontoFeeOculto"><label for="checkMontoFeeOculto">MontoFeeOculto</label></td>
+        <!--fin no existe-->
+      </tr>
+      <tr>
+        <td><input id="checkMontoFeeOcultoCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoFeeOcultoCLP"><label for="checkMontoFeeOcultoCLP">MontoFeeOcultoCLP</label></td>
+        <td><input id="checkMontoFeeOcultoUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoFeeOcultoUSD"><label for="checkMontoFeeOcultoUSD">MontoFeeOcultoUSD</label></td>
+        <td><input id="checkMontoFeeUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoFeeUSD"><label for="checkMontoFeeUSD">MontoFeeUSD</label></td>
+        <td><input id="checkMontoIva" type="checkbox" [(ngModel)]="config.actions.actionMontoIva"><label for="checkMontoIva">MontoIva</label></td>
+        <td><input id="checkMontoIvaCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoIvaCLP"><label for="checkMontoIvaCLP">MontoIvaCLP</label></td>
+      </tr>
+      <tr>
+        <td><input id="checkMontoIvaUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoIvaUSD"><label for="checkMontoIvaUSD">MontoIvaUSD</label></td>
+        <td><input id="checkMontoMargen" type="checkbox" [(ngModel)]="config.actions.actionMontoMargen"><label for="checkMontoMargen">MontoMargen</label></td>
+        <td><input id="checkMontoMargenCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoMargenCLP"><label for="checkMontoMargenCLP">MontoMargenCLP</label></td>
+        <td><input id="checkMontoMargenRiesgo" type="checkbox" [(ngModel)]="config.actions.actionMontoMargenRiesgo"><label for="checkMontoMargenRiesgo">MontoMargenRiesgo</label></td>
+        <td><input id="checkMontoMargenRiesgoCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoMargenRiesgoCLP"><label for="checkMontoMargenRiesgoCLP">MontoMargenRiesgoCLP</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkMontoMargenRiesgoUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoMargenRiesgoUSD"><label for="checkMontoMargenRiesgoUSD">MontoMargenRiesgoUSD</label></td>
+        <td><input id="checkMontoMargenUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoMargenUSD"><label for="checkMontoMargenUSD">MontoMargenUSD</label></td>
+        <td><input id="checkMontoTax" type="checkbox" [(ngModel)]="config.actions.actionMontoTax"><label for="checkMontoTax">MontoTax</label></td>
+        <td><input id="checkMontoTaxCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoTaxCLP"><label for="checkMontoTax">MontoTaxCLP</label></td>
+        <td><input id="checkMontoTaxUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoTaxUSD"><label for="checkMontoTaxUSD">MontoTaxUSD</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkMontoTotal" type="checkbox" [(ngModel)]="config.actions.actionMontoTotal"><label for="checkMontoTotal">MontoTotal</label></td>
+        <td><input id="checkMontoTotalCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoTotalCLP"><label for="checkMontoTotalCLP">MontoTotalCLP</label></td>
+        <td><input id="checkMontoTotalUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoTotalUSD"><label for="checkMontoTotalUSD">MontoTotalUSD</label></td>
+        <td><input id="checkMontoVenta" type="checkbox" [(ngModel)]="config.actions.actionMontoVenta"><label for="checkMontoVenta">MontoVenta</label></td>
+        <td><input id="checkMontoVentaCLP" type="checkbox" [(ngModel)]="config.actions.actionMontoVentaCLP"><label for="checkMontoVentaCLP">MontoVentaCLP</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkMontoVentaUSD" type="checkbox" [(ngModel)]="config.actions.actionMontoVentaUSD"><label for="checkMontoVentaUSD">MontoVentaUSD</label></td>
+        <td><input id="checkNoFacturaLinea" type="checkbox" [(ngModel)]="config.actions.actionNoFacturaLinea"><label for="checkNoFacturaLinea">NoFacturaLinea</label></td>
+        <td><input id="checkNombrePasajero" type="checkbox" [(ngModel)]="config.actions.actionNombrePasajero"><label for="checkNombrePasajero">NombrePasajero</label></td>
+        <td><input id="checkNoTarjetaCredito" type="checkbox" [(ngModel)]="config.actions.actionNoTarjetaCredito"><label for="checkNoTarjetaCredito">NoTarjetaCredito</label></td>
+        <td><input id="checkNoTicket" type="checkbox" [(ngModel)]="config.actions.actionNoTicket"><label for="checkNoTicket">NoTicket</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkNoTicketReemiison" type="checkbox" [(ngModel)]="config.actions.actionNoTicketReemiison"><label for="checkNoTicketReemiison">NoTicketReemicion</label></td>
+        <td><input id="checkNoVoucher" type="checkbox" [(ngModel)]="config.actions.actionNoVoucher"><label for="checkNoVoucher">NoVoucher</label></td>
+        <td><input id="checkNumeroNoches" type="checkbox" [(ngModel)]="config.actions.actionNumeroNoches"><label for="checkNumeroNoches">NumeroNoches</label></td>
+        <td><input id="checkPaisDestino" type="checkbox" [(ngModel)]="config.actions.actionPaisDestino"><label for="checkPaisDestino">PaisDestino</label></td>
+        <td><input id="checkPaisOrigen" type="checkbox" [(ngModel)]="config.actions.actionPaisOrigen"><label for="checkPaisOrigen">PaisOrigen</label></td>
+      </tr>
+      <tr> 
+        <td><input id="checkPnrLocator" type="checkbox" [(ngModel)]="config.actions.actionPnrLocator"><label for="checkPnrLocator">PnrLocator</label></td>
+        <td><input id="checkProveedor" type="checkbox" [(ngModel)]="config.actions.actionProveedor"><label for="checkProveedor">Proveedor</label></td>
+        <td><input id="checkProveedorBsp" type="checkbox" [(ngModel)]="config.actions.actionProveedorBsp"><label for="checkProveedorBsp">ProveedorBsp</label></td>
+        <td><input id="checkRemark01" type="checkbox" [(ngModel)]="config.actions.actionRemark01"><label for="checkRemark01">Remark01</label></td>
+        <td><input id="checkRemark02" type="checkbox" [(ngModel)]="config.actions.actionRemark02"><label for="checkRemark02">Remark02</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkRemark03" type="checkbox" [(ngModel)]="config.actions.actionRemark03"><label for="checkRemark03">Remark03</label></td>
+        <td><input id="checkRemark04" type="checkbox" [(ngModel)]="config.actions.actionRemark04"><label for="checkRemark04">Remark04</label></td>
+        <td><input id="checkRemark05" type="checkbox" [(ngModel)]="config.actions.actionRemark05"><label for="checkRemark05">Remark05</label></td>
+        <td><input id="checkRemark06" type="checkbox" [(ngModel)]="config.actions.actionRemark06"><label for="checkRemark06">Remark06</label></td>
+        <td><input id="checkRemark07" type="checkbox" [(ngModel)]="config.actions.actionRemark07"><label for="checkRemark07">Remark07</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkRemark08" type="checkbox" [(ngModel)]="config.actions.actionRemark08"><label for="checkRemark08">Remark08</label></td>
+        <td><input id="checkRemark09" type="checkbox" [(ngModel)]="config.actions.actionRemark09"><label for="checkRemark09">Remark09</label></td>
+        <td><input id="checkRemark10" type="checkbox" [(ngModel)]="config.actions.actionRemark10"><label for="checkRemark10">Remark10</label></td>
+        <td><input id="checkRemark11" type="checkbox" [(ngModel)]="config.actions.actionRemark11"><label for="checkRemark11">Remark11</label></td>
+        <td><input id="checkRemark12" type="checkbox" [(ngModel)]="config.actions.actionRemark12"><label for="checkRemark12">Remark12</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkRemark13" type="checkbox" [(ngModel)]="config.actions.actionRemark13"><label for="checkRemark13">Remark13</label></td>
+        <td><input id="checkRemark14" type="checkbox" [(ngModel)]="config.actions.actionRemark14"><label for="checkRemark14">Remark14</label></td>
+        <td><input id="checkRemark15" type="checkbox" [(ngModel)]="config.actions.actionRemark15"><label for="checkRemark15">Remark15</label></td>
+        <td><input id="checkRemark16" type="checkbox" [(ngModel)]="config.actions.actionRemark16"><label for="checkRemark16">Remark16</label></td>
+        <td><input id="checkRemark17" type="checkbox" [(ngModel)]="config.actions.actionRemark17"><label for="checkRemark17">Remark17</label></td>
+      </tr>
+      <tr> 
+        <td><input id="checkRemark18" type="checkbox" [(ngModel)]="config.actions.actionRemark18"><label for="checkRemark18">Remark18</label></td>
+        <td><input id="checkRemark19" type="checkbox" [(ngModel)]="config.actions.actionRemark19"><label for="checkRemark19">Remark19</label></td>
+        <td><input id="checkRemark20" type="checkbox" [(ngModel)]="config.actions.actionRemark20"><label for="checkRemark20">Remark20</label></td>
+        <td><input id="checkRemark21" type="checkbox" [(ngModel)]="config.actions.actionRemark21"><label for="checkRemark21">Remark21</label></td>
+        <td><input id="checkRemark22" type="checkbox" [(ngModel)]="config.actions.actionRemark22"><label for="checkRemark22">Remark22</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkRemark23" type="checkbox" [(ngModel)]="config.actions.actionRemark23"><label for="checkRemark23">Remark23</label></td>
+        <td><input id="checkRemark24" type="checkbox" [(ngModel)]="config.actions.actionRemark24"><label for="checkRemark24">Remark24</label></td>
+        <td><input id="checkRuta" type="checkbox" [(ngModel)]="config.actions.actionRuta"><label for="checkRuta">Ruta</label></td>
+        <td><input id="checkServicio" type="checkbox" [(ngModel)]="config.actions.actionServicio"><label for="checkServicio">Servicio</label></td>
+        <td><input id="checkSucursal" type="checkbox" [(ngModel)]="config.actions.actionSucursal"><label for="checkSucursal">Sucursal</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkSunProducto" type="checkbox" [(ngModel)]="config.actions.actionSunProducto"><label for="checkSunProducto">SunProducto</label></td>
+        <td><input id="checkTaa" type="checkbox" [(ngModel)]="config.actions.actionTaa"><label for="checkTaa">TAA</label></td>
+        <td><input id="checkTad" type="checkbox" [(ngModel)]="config.actions.actionTad"><label for="checkTad">TAD</label></td>
+        <td><input id="checkTarjetaCredito" type="checkbox" [(ngModel)]="config.actions.actionTarjetaCredito"><label for="checkTarjetaCredito">TarjetaCredito</label></td>
+        <td><input id="checkTba" type="checkbox" [(ngModel)]="config.actions.actionTba"><label for="checkTba">TBA</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkTbd" type="checkbox" [(ngModel)]="config.actions.actionTbd"><label for="checkTbd">Tbd</label></td>
+        <td><input id="checkTbvp" type="checkbox" [(ngModel)]="config.actions.actionTbvp"><label for="checkTbvp">TBVP</label></td>
+        <td><input id="checkTipoER" type="checkbox" [(ngModel)]="config.actions.actionTipoER"><label for="checkTipoER">TipoER</label></td>
+        <td><input id="checkTipoNI" type="checkbox" [(ngModel)]="config.actions.actionTipoNI"><label for="checkTipoNI">TipoNI</label></td>
+        <td><input id="checkTipoCambio" type="checkbox" [(ngModel)]="config.actions.actionTipoCambio"><label for="checkTipoCambio">TipoCambio</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkTipoInterfaz" type="checkbox" [(ngModel)]="config.actions.actionTipoInterfaz"><label for="checkTipoInterfaz">TipoInterfaz</label></td>
+        <td><input id="checkTipoNegocio" type="checkbox" [(ngModel)]="config.actions.actionTipoNegocio"><label for="checkTipoNegocio">TipoNegocio</label></td>
+        <td><input id="checkTipoPago" type="checkbox" [(ngModel)]="config.actions.actionTipoPago"><label for="checkTipoPago">TipoPago</label></td>
+        <td><input id="checkTotalGasto" type="checkbox" [(ngModel)]="config.actions.actionTotalGasto"><label for="checkTotalGasto">TotalGasto</label></td>
+        <td><input id="checkTotalTarifa" type="checkbox" [(ngModel)]="config.actions.actionTotalTarifa"><label for="checkTotalTarifa">TotalTarifa</label></td>
+      </tr>
+      <tr>  
+        <td><input id="checkVendedora" type="checkbox" [(ngModel)]="config.actions.actionVendedora"><label for="checkVendedora">Vendedora</label></td>
+        <td><input id="checkVoucherComisionPorcentaje" type="checkbox" [(ngModel)]="config.actions.actionVoucherComisionPorcentaje"><label for="checkVoucherComisionPorcentaje">VoucherComision %</label></td>
+        <td><input id="checkVoucherMontoComision" type="checkbox" [(ngModel)]="config.actions.actionVoucherMontoComision"><label for="checkVoucherMontoComision">VoucherMontoComision</label></td>
+        <td><input id="checkVoucherMontoTotal" type="checkbox" [(ngModel)]="config.actions.actionVoucherMontoTotal"><label for="checkVoucherMontoTotal">VoucherMontoTotal</label></td>
+        <td><input id="checkVoucherNetoAPagar" type="checkbox" [(ngModel)]="config.actions.actionVoucherNetoAPagar"><label for="checkVoucherNetoAPagar">VoucherNetoAPagar</label></td>
+      </tr>
+    </table>
+  </div>
+</div>
+<!--FIN MOSTRAR OCULTAR COLUMNAS-->
+
+
+<!--FILTRO POR COLUMNAS-->
+<div class="collapse" id="collapseFiltros">
+  <div class="card card-body">
+	  <div class="row">
+			<div class="col-6">
+	        <tr>
+	          <td>
+	            <label for="cbSucursal">Sucursal</label>
+	          </td>
+	          <td>
+	            <select class="custom-select mr-sm-2" name="cbSucursal" id="cbSucursal" [(ngModel)]="config.filtersSelected.sucursal"
+              >
+	               <option [value]="suc.valor"  *ngFor="let suc of filters.sucursal" [selected]="config.filtersSelected.sucursal===suc.valor">  {{suc.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+	  
+	        <tr>
+	          <td>
+	            <label for="cbSucursal">Estado negocio</label>
+	          </td>
+	          <td>
+	             <select class="custom-select mr-sm-2" name="cbEstadoNegocio" id="cbEstadoNegocio" [(ngModel)]="config.filtersSelected.estadoNegocio">
+	               <option [value]="estNeg.valor"  *ngFor="let estNeg of filters.estadoNegocio" [selected]="config.filtersSelected.estadoNegocio===estNeg.valor">
+	                  {{estNeg.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+	  
+	        <tr>
+	          <td>
+	            <label for="cbTipoNegocio">Tipo Negocio</label>
+            </td>
+            <td>
+               <select class="custom-select mr-sm-2" name="cbTipoNegocio" id="cbTipoNegocio" [(ngModel)]="config.filtersSelected.tipoNegocio">
+	               <option [value]="tipoNeg.valor"  *ngFor="let tipoNeg of filters.tipoNegocio"[selected]="config.filtersSelected.tipoNegocio===tipoNeg.valor"> 
+	                  {{tipoNeg.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+	  
+	        <tr>
+	          <td>
+	            <label for="cbTipoNegocio">Linea Negocio</label>
+	          </td>
+            <td>
+               <select class="custom-select mr-sm-2" name="cbLineaNegocio" id="cbLineaNegocio" [(ngModel)]="config.filtersSelected.lineaNegocio">
+	               <option [value]="lineaNeg.valor"  *ngFor="let lineaNeg of filters.lineaNegocio" [selected]="config.filtersSelected.lineaNegocio===lineaNeg.valor"> 
+	                  {{lineaNeg.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+	  
+	        <tr>
+	          <td>
+	            <label for="cbTipoNegocio">Vendedora</label>
+	          </td>
+	          <td>
+	             <select class="custom-select mr-sm-2" name="cbVendedora" id="cbVendedora" [(ngModel)]="config.filtersSelected.vendedora">
+	               <option [value]="vend.valor"  *ngFor="let vend of filters.vendedora" [selected]="config.filtersSelected.vendedora===vend.valor"> 
+	                  {{vend.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+  			<tr>
+	          <td>
+	            <label for="cbTipoNegocio">Cliente</label>
+	          </td>
+	          <td>
+	             <select class="custom-select mr-sm-2" name="cbCliente" id="cbCliente" [(ngModel)]="config.filtersSelected.cliente">
+	               <option [value]="cli.valor"  *ngFor="let cli of filters.cliente" [selected]="config.filtersSelected.cliente===cli.valor"> 
+	                  {{cli.valor}}</option>
+	             </select>
+	          </td>
+	        </tr>
+
+  			<tr>
+	        <td>
+	          <label for="cbTipoNegocio">Estado linea</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbEstadoLinea" id="cbEstadoLinea" [(ngModel)]="config.filtersSelected.estadoLinea"
+             >
+	             <option [value]="estLinea.valor" *ngFor="let estLinea of filters.estadoLinea" [selected]="config.filtersSelected.estadoLinea===estLinea.valor"> 
+	                {{estLinea.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+        <tr>
+          <td>
+            <label for="cbProveedorBsp">ProveedorBsp</label>
+          </td>
+          <td>
+             <select class="custom-select mr-sm-2" name="cbProveedorBsp" id="cbProveedorBsp" [(ngModel)]="config.filtersSelected.proveedorBsp"
+             >
+               <option [value]="provBsp.valor" *ngFor="let provBsp of filters.proveedorBsp" [selected]="config.filtersSelected.proveedorBsp===provBsp.valor"> 
+                  {{provBsp.valor}}</option>
+             </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label for="cbTipoPago">TipoPago</label>
+          </td>
+          <td>
+             <select class="custom-select mr-sm-2" name="cbTipoPago" id="cbTipoPago" [(ngModel)]="config.filtersSelected.tipoPago"
+             >
+               <option [value]="tipoP.valor" *ngFor="let tipoP of filters.tipoPago" [selected]="config.filtersSelected.tipoPago===tipoP.valor"> 
+                  {{tipoP.valor}}</option>
+             </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label for="cbCiudadOrigen">CiudadOrigen</label>
+          </td>
+          <td>
+             <select class="custom-select mr-sm-2" name="cbCiudadOrigen" id="cbCiudadOrigen" [(ngModel)]="config.filtersSelected.ciudadOrigen"
+             >
+               <option [value]="ciudadO.valor" *ngFor="let ciudadO of filters.ciudadOrigen" [selected]="config.filtersSelected.ciudadOrigen===ciudadO.valor"> 
+                  {{ciudadO.valor}}</option>
+             </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label for="cbPaisOrigen">PaisOrigen</label>
+          </td>
+          <td>
+             <select class="custom-select mr-sm-2" name="cbPaisOrigen" id="cbPaisOrigen" [(ngModel)]="config.filtersSelected.paisOrigen"
+             >
+               <option [value]="paisO.valor" *ngFor="let paisO of filters.paisOrigen" [selected]="config.filtersSelected.paisOrigen===paisO.valor"> 
+                  {{paisO.valor}}</option>
+             </select>
+          </td>
+        </tr>
+
+	    </div>
+
+  		<div class="col-6">
+
+        <tr>
+          <td>
+            <label for="cbInterfaz">Interfaz</label>
+          </td>
+          <td>
+             <select class="custom-select mr-sm-2" name="cbInterfaz" id="cbInterfaz" [(ngModel)]="config.filtersSelected.Interfaz" 
+             >
+               <option [value]="interf.valor"  *ngFor="let interf of filters.interfaz" [selected]="config.filtersSelected.interfaz===interf.valor"> 
+                  {{interf.valor}}</option>
+             </select>
+          </td>
+        </tr>
+  			<tr>
+	        <td>
+	          <label for="cbTipoNegocio">Tipo interfaz</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbTipoInterfaz" id="cbTipoInterfaz" [(ngModel)]="config.filtersSelected.tipoInterfaz"
+             >
+	             <option [value]="tipoInterf.valor"  *ngFor="let tipoInterf of filters.tipoInterfaz" [selected]="config.filtersSelected.tipoInterfaz===tipoInterf.valor"> 
+	                {{tipoInterf.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbSunProducto">Sun producto</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbSunProducto" id="cbSunProducto" [(ngModel)]="config.filtersSelected.sunProducto"
+             >
+	             <option [value]="sunProd.valor"  *ngFor="let sunProd of filters.sunProducto" [selected]="config.filtersSelected.sunProducto===sunProd.valor"> 
+	                {{sunProd.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbProveedor">Proveedor</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbProveedor" id="cbProveedor" [(ngModel)]="config.filtersSelected.proveedor"
+             >
+	             <option [value]="prov.valor"  *ngFor="let prov of filters.proveedor" [selected]="config.filtersSelected.proveedor===prov.valor"> 
+	                {{prov.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbServicio">servicio</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbServicio" id="cbServicio" [(ngModel)]="config.filtersSelected.servicio"
+             >
+	             <option [value]="serv.valor"  *ngFor="let serv of filters.servicio" [selected]="config.filtersSelected.servicio===serv.valor"> 
+	                {{serv.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbNombrePasajero">Nombre pasajero</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbNombrePasajero" id="cbNombrePasajero" [(ngModel)]="config.filtersSelected.nombrePasajero"
+             >
+	             <option [value]="nomPasaj.valor"  *ngFor="let nomPasaj of filters.nombrePasajero" [selected]="config.filtersSelected.nombrePasajero===nomPasaj.valor"> 
+	                {{nomPasaj.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbMoneda">Moneda</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbMoneda" id="cbMoneda" [(ngModel)]="config.filtersSelected.moneda"
+             >
+	             <option [value]="mon.valor"  *ngFor="let mon of filters.moneda" [selected]="config.filtersSelected.moneda===mon.valor">  {{mon.valor}}</option>
+	           </select>
+	        </td>
+	      </tr>
+
+	      <tr>
+	        <td>
+	          <label for="cbAuditor">Auditor</label>
+	        </td>
+	        <td>
+	           <select class="custom-select mr-sm-2" name="cbAuditor" id="cbAuditor" [(ngModel)]="config.filtersSelected.auditor"
+             >
+	             <option [value]="aud.valor"  *ngFor="let aud of filters.auditor" [selected]="config.filtersSelected.auditor===aud.valor"> 
+	                {{aud.valor}}</option>
+	           </select>
+	          </td>
+	        </tr>
+
+        <tr>
+          <td>
+            <label for="cbTarjetaCredito">TarjetaCredito</label>
+          </td>
+          <td>
+            <select class="custom-select mr-sm-2" name="cbTarjetaCredito" id="cbTarjetaCredito" [(ngModel)]="config.filtersSelected.tarjetaCredito"
+            >
+              <option [value]="tarjCred.valor"  *ngFor="let tarjCred of filters.tarjetaCredito" [selected]="config.filtersSelected.tarjetaCredito===tarjCred.valor"> 
+                 {{tarjCred.valor}}</option>
+           </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label for="cbCiudadDestino">CiudadDestino</label>
+          </td>
+          <td>
+            <select class="custom-select mr-sm-2" name="cbCiudadDestino" id="cbCiudadDestino" [(ngModel)]="config.filtersSelected.ciudadDestino"
+            >
+              <option [value]="ciudadD.valor"  *ngFor="let ciudadD of filters.ciudadDestino" [selected]="config.filtersSelected.ciudadDestino===ciudadD.valor"> 
+                 {{ciudadD.valor}}</option>
+           </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label for="cbPaisDestino">PaisDestino</label>
+          </td>
+          <td>
+            <select class="custom-select mr-sm-2" name="cbPaisDestino" id="cbPaisDestino" [(ngModel)]="config.filtersSelected.paisDestino"
+            >
+              <option [value]="paisD.valor"  *ngFor="let paisD of filters.paisDestino" [selected]="config.filtersSelected.paisDestino===paisD.valor"> 
+                 {{paisD.valor}}</option>
+           </select>
+          </td>
+        </tr>
+
+  		</div>
+		</div>
+  </div>
+</div>
+<!--FIN FILTROS POR COLUMNAS-->
+
+<!--FILTRO POR AGRUPACION-->
+<div class="collapse" id="collapseAgrupacion">
+  <div class="card card-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="checkAgrupar" (change)="getTabla()"  [(ngModel)]="config.actionAgrupar">
+            <label class="form-check-label" for="Agrupar">Agrupar</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--FIN FILTROS POR COLUMNAS-->
+
+
+<!--GRILLA-->
+<!--table id="gridSabana" datatable [dtOptions]="dtOptions" class="table-bordered" style="margin-top: 1%"-->
+<div class="row">
+  <div class="col-12">
+    <div class="collapse" [ngClass]="{'show': isOpen}"  id="collapseOcultarGrilla" >
+      <table class="table table-sm table-bordered" style="margin-top: 1%">
+        <thead class="" style="background-color: #DEEDF8">
+          <tr>
+            <th [class.active]="order === 'idVentaNegocio'" (click)="setOrder('idVentaNegocio')" [hidden]="!config.actions.actionIdVentaNegocio">
+              <span id="lbIdVentaNegocio" [hidden]="reverse">▼</span>
+              <span id="lbIdVentaNegocio" [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdVentaNegocio</b>
+            </th>
+            <th [class.active]="order === 'sucursal'" (click)="setOrder('sucursal')" [hidden]="!config.actions.actionSucursal">
+              <span id="lbIdVentaNegocio" [hidden]="reverse">▼</span>
+              <span id="lbIdVentaNegocio" [hidden]="!reverse">▲</span>
+              <b class="lbHead">Sucursal</b>
+            </th>
+            <th [class.active]="order === 'estadoNegocio'" (click)="setOrder('estadoNegocio')" [hidden]="!config.actions.actionEstadoNegocio">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">EstadoNegocio </b>
+            </th>
+            <th [class.active]="order === 'tipoNegocio'" (click)="setOrder('tipoNegocio')" [hidden]="!config.actions.actionTipoNegocio">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TipoNegocio </b>
+            </th>
+            <th [class.active]="order === 'lineaNegocio'" (click)="setOrder('lineaNegocio')" [hidden]="!config.actions.actionLineaNegocio">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">LineaNegocio </b>
+            </th>
+            <th [class.active]="order === 'vendedora'" (click)="setOrder('vendedora')" [hidden]="!config.actions.actionVendedora">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">Vendedora </b>
+            </th>
+            <th [class.active]="order === 'cliente'" (click)="setOrder('cliente')" [hidden]="!config.actions.actionCliente">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">Cliente</b>
+            </th>
+            <th [class.active]="order === 'fechaCreacion'" (click)="setOrder('fechaCreacion')" [hidden]="!config.actions.actionFechaCreacion">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaCreacion</b>
+            </th>
+            <th [class.active]="order === 'cerrado'" (click)="setOrder('cerrado')" [hidden]="!config.actions.actionCerrado">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">cerrado</b>
+            </th>
+            <th [class.active]="order === 'idVentaNegocioDetalle'" (click)="setOrder('idVentaNegocioDetalle')" [hidden]="!config.actions.actionIdVentaNegocioDetalle">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">idVentaNegocioDetalle</b>
+            </th>
+            <th [class.active]="order === 'estadoLinea'" (click)="setOrder('estadoLinea')" [hidden]="!config.actions.actionEstadoLinea">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">estadoLinea</b>
+            </th>
+            <th [class.active]="order === 'Interfaz'" (click)="setOrder('Interfaz')" [hidden]="!config.actions.actionInterfaz">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">Interfaz</b>
+            </th>
+            <th [class.active]="order === 'tipoInterfaz'" (click)="setOrder('tipoInterfaz')" [hidden]="!config.actions.actionTipoInterfaz">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tipoInterfaz</b>
+            </th>
+            <th [class.active]="order === 'sunProducto'" (click)="setOrder('sunProducto')" [hidden]="!config.actions.actionSunProducto">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">sunProducto</b>
+            </th>
+            <th [class.active]="order === 'proveedor'" (click)="setOrder('proveedor')" [hidden]="!config.actions.actionProveedor">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">proveedor</b>
+            </th>
+            <th [class.active]="order === 'servicio'" (click)="setOrder('servicio')" [hidden]="!config.actions.actionServicio">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">servicio</b>
+            </th>
+            <th [class.active]="order === 'nombrePasajero'" (click)="setOrder('nombrePasajero')" [hidden]="!config.actions.actionNombrePasajero">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">nombrePasajero</b>
+            </th>
+            <th [class.active]="order === 'moneda'" (click)="setOrder('moneda')" [hidden]="!config.actions.actionMoneda">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">moneda</b>
+            </th>
+            <th [class.active]="order === 'tipoCambio'" (click)="setOrder('tipoCambio')" [hidden]="!config.actions.actionTipoCambio">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tipoCambio</b>
+            </th>
+            <th [class.active]="order === 'montoVenta'" (click)="setOrder('montoVenta')" [hidden]="!config.actions.actionMontoVenta">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoVenta</b>
+            </th>
+            <th [class.active]="order === 'montoTax'" (click)="setOrder('montoTax')" [hidden]="!config.actions.actionMontoTax">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTax</b>
+            </th>
+            <th [class.active]="order === 'montoTotal'" (click)="setOrder('montoTotal')" [hidden]="!config.actions.actionMontoTotal">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTotal</b>
+            </th>
+            <th [class.active]="order === 'comision'" (click)="setOrder('comision')" [hidden]="!config.actions.actionComision">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comision</b>
+            </th>
+            <th [class.active]="order === 'comisionIva'" (click)="setOrder('comisionIva')" [hidden]="!config.actions.actionComisionIva">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comisionIva</b>
+            </th>
+            <th [class.active]="order === 'montoCosto'" (click)="setOrder('montoCosto')" [hidden]="!config.actions.actionMontoCosto">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoCosto</b>
+            </th>
+            <th [class.active]="order === 'descuento'" (click)="setOrder('descuento')" [hidden]="!config.actions.actionDescuento">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">descuento</b>
+            </th>
+            <th [class.active]="order === 'montoDescuento'" (click)="setOrder('montoDescuento')" [hidden]="!config.actions.actionMontoDescuento">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoDescuento</b>
+            </th>
+            <th [class.active]="order === 'iva'" (click)="setOrder('iva')" [hidden]="!config.actions.actionIva">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">iva</b>
+            </th>
+            <th [class.active]="order === 'montoIva'" (click)="setOrder('montoIva')" [hidden]="!config.actions.actionMontoIva">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoIva</b>
+            </th>
+            <th [class.active]="order === 'montoFee'" (click)="setOrder('montoFee')" [hidden]="!config.actions.actionMontoFee">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFee</b>
+            </th>
+            <th [class.active]="order === 'montoMargen'" (click)="setOrder('montoMargen')" [hidden]="!config.actions.actionMontoMargen">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargen</b>
+            </th>
+            <th [class.active]="order === 'montoFreeOculto'" (click)="setOrder('montoFreeOculto')" [hidden]="!config.actions.actionMontoFeeOculto">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFreeOculto</b>
+            </th>
+            <th [class.active]="order === 'montoMargenRiesgo'" (click)="setOrder('montoMargenRiesgo')" [hidden]="!config.actions.actionMontoMargenRiesgo">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargenRiesgo</b>
+            </th>
+            <th [class.active]="order === 'montoVentaCLP'" (click)="setOrder('montoVentaCLP')" [hidden]="!config.actions.actionMontoVentaCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoVentaCLP</b>
+            </th>
+            <th [class.active]="order === 'montoTaxCLP'" (click)="setOrder('montoTaxCLP')" [hidden]="!config.actions.actionMontoTaxCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTaxCLP</b>
+            </th>
+            <th [class.active]="order === 'montoTotalCLP'" (click)="setOrder('montoTotalCLP')" [hidden]="!config.actions.actionMontoTotalCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTotalCLP</b>
+            </th>
+            <th [class.active]="order === 'comisionCLP'" (click)="setOrder('comisionCLP')" [hidden]="!config.actions.actionComisionCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comisionCLP</b>
+            </th>
+            <th [class.active]="order === 'comisionIvaCLP'" (click)="setOrder('comisionIvaCLP')" [hidden]="!config.actions.actionComisionIvaCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comisionIvaCLP</b>
+            </th>
+            <th [class.active]="order === 'montoCostoCLP'" (click)="setOrder('montoCostoCLP')" [hidden]="!config.actions.actionMontoCostoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoCostoCLP</b>
+            </th>
+            <th [class.active]="order === 'descuentoCLP'" (click)="setOrder('descuentoCLP')" [hidden]="!config.actions.actionDescuentoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">descuentoCLP</b>
+            </th>
+            <th [class.active]="order === 'montoDescuentoCLP'" (click)="setOrder('montoDescuentoCLP')" [hidden]="!config.actions.actionMontoDescuentoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoDescuentoCLP</b>
+            </th>
+            <th [class.active]="order === 'nombreDescuentoCLP'" (click)="setOrder('nombreDescuentoCLP')" [hidden]="!config.actions.actionNombreDescuentoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">nombreDescuentoCLP</b>
+            </th>
+            <th [class.active]="order === 'ivaCLP'" (click)="setOrder('ivaCLP')" [hidden]="!config.actions.actionIvaCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ivaCLP</b>
+            </th>
+            <th [class.active]="order === 'montoIvaCLP'" (click)="setOrder('montoIvaCLP')" [hidden]="!config.actions.actionMontoIvaCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoIvaCLP</b>
+            </th>
+            <th [class.active]="order === 'montoFeeCLP'" (click)="setOrder('montoFeeCLP')" [hidden]="!config.actions.actionMontoFeeCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFeeCLP</b>
+            </th>
+            <th [class.active]="order === 'montoMargenCLP'" (click)="setOrder('montoMargenCLP')" [hidden]="!config.actions.actionMontoMargenCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargenCLP</b>
+            </th>
+            <th [class.active]="order === 'montoFeeOcultoCLP'" (click)="setOrder('montoFeeOcultoCLP')" [hidden]="!config.actions.actionMontoFeeOcultoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFeeOcultoCLP</b>
+            </th>
+            <th [class.active]="order === 'montoMargenRiesgoCLP'" (click)="setOrder('montoMargenRiesgoCLP')" [hidden]="!config.actions.actionMontoMargenRiesgoCLP">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargenRiesgoCLP</b>
+            </th>
+            <th [class.active]="order === 'montoVentaUSD'" (click)="setOrder('montoVentaUSD')" [hidden]="!config.actions.actionMontoVentaUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoVentaUSD</b>
+            </th>
+            <th [class.active]="order === 'montoTaxUSD'" (click)="setOrder('montoTaxUSD')" [hidden]="!config.actions.actionMontoTaxUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTaxUSD</b>
+            </th>
+            <th [class.active]="order === 'montoTotalUSD'" (click)="setOrder('montoTotalUSD')" [hidden]="!config.actions.actionMontoTotalUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoTotalUSD</b>
+            </th>
+            <th [class.active]="order === 'comisionUSD'" (click)="setOrder('comisionUSD')" [hidden]="!config.actions.actionComisionUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comisionUSD</b>
+            </th>
+            <th [class.active]="order === 'comisionIvaUSD'" (click)="setOrder('comisionIvaUSD')" [hidden]="!config.actions.actionComisionIvaUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">comisionIvaUSD</b>
+            </th>
+            <th [class.active]="order === 'montoCostoUSD'" (click)="setOrder('montoCostoUSD')" [hidden]="!config.actions.actionMontoCostoUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoCostoUSD</b>
+            </th>
+            <th [class.active]="order === 'descuentoUSD'" (click)="setOrder('descuentoUSD')" [hidden]="!config.actions.actionDescuentoUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">descuentoUSD</b>
+            </th>
+            <th [class.active]="order === 'montoDescuentoUSD'" (click)="setOrder('montoDescuentoUSD')" [hidden]="!config.actions.actionMontoDescuentoUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoDescuentoUSD</b>
+            </th>
+            <th [class.active]="order === 'ivaUSD'" (click)="setOrder('ivaUSD')" [hidden]="!config.actions.actionIvaUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ivaUSD</b>
+            </th>
+            <th [class.active]="order === 'montoIvaUSD'" (click)="setOrder('montoIvaUSD')" [hidden]="!config.actions.actionMontoIvaUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoIvaUSD</b>
+            </th>
+            <th [class.active]="order === 'montoFeeUSD'" (click)="setOrder('montoFeeUSD')" [hidden]="!config.actions.actionMontoFeeUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFeeUSD</b>
+            </th>
+            <th [class.active]="order === 'montoMargenUSD'" (click)="setOrder('montoMargenUSD')" [hidden]="!config.actions.actionMontoMargenUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargenUSD</b>
+            </th>
+            <th [class.active]="order === 'montoFeeOcultoUSD'" (click)="setOrder('montoFeeOcultoUSD')" [hidden]="!config.actions.actionMontoFeeOcultoUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFeeOcultoUSD</b>
+            </th>
+            <th [class.active]="order === 'montoMargenRiesgoUSD'" (click)="setOrder('montoMargenRiesgoUSD')" [hidden]="!config.actions.actionMontoMargenRiesgoUSD">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoMargenRiesgoUSD</b>
+            </th>
+            <th [class.active]="order === 'fechaViajeDesde'" (click)="setOrder('fechaViajeDesde')" [hidden]="!config.actions.actionFechaViajeDesde">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaViajeDesde</b>
+            </th>
+            <th [class.active]="order === 'fechaViajeHasta'" (click)="setOrder('fechaViajeHasta')" [hidden]="!config.actions.actionFechaViajeHasta">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaViajeHasta</b>
+            </th>
+            <th [class.active]="order === 'fechaFacturaLinea'" (click)="setOrder('fechaFacturaLinea')" [hidden]="!config.actions.actionFechaFacturaLinea">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaFacturaLinea</b>
+            </th>
+            <th [class.active]="order === 'noFacturaLinea'" (click)="setOrder('noFacturaLinea')" [hidden]="!config.actions.actionNoFacturaLinea">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">noFacturaLinea</b>
+            </th>
+            <th [class.active]="order === 'montoFacturadoLinea'" (click)="setOrder('montoFacturadoLinea')" [hidden]="!config.actions.actionMontoFacturadoLinea">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">montoFacturadoLinea</b>
+            </th>
+            <th [class.active]="order === 'impuestoFacturadoLinea'" (click)="setOrder('impuestoFacturadoLinea')" [hidden]="!config.actions.actionImpuestoFacturadoLinea">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">impuestoFacturadoLinea</b>
+            </th>
+            <th [class.active]="order === 'inferfaz'" (click)="setOrder('inferfaz')" [hidden]="!config.actions.actionInferfaz">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">inferfaz</b>
+            </th>
+            <th [class.active]="order === 'iata'" (click)="setOrder('iata')" [hidden]="!config.actions.actionIata">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">iata</b>
+            </th>
+            <th [class.active]="order === 'proveedorBsp'" (click)="setOrder('proveedorBsp')" [hidden]="!config.actions.actionProveedorBsp">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">proveedorBsp</b>
+            </th>
+            <th [class.active]="order === 'tipoPago'" (click)="setOrder('tipoPago')" [hidden]="!config.actions.actionTipoPago">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tipoPago</b>
+            </th>
+            <th [class.active]="order === 'tarjetaCredito'" (click)="setOrder('tarjetaCredito')" [hidden]="!config.actions.actionTarjetaCredito">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tarjetaCredito</b>
+            </th>
+            <th [class.active]="order === 'NoTarjetaCredito'" (click)="setOrder('NoTarjetaCredito')" [hidden]="!config.actions.actionNoTarjetaCredito">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">NoTarjetaCredito</b>
+            </th>
+            <th [class.active]="order === 'noTicket'" (click)="setOrder('noTicket')" [hidden]="!config.actions.actionNoTicket">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">noTicket</b>
+            </th>
+            <th [class.active]="order === 'pnrLocator'" (click)="setOrder('pnrLocator')" [hidden]="!config.actions.actionPnrLocator">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">pnrLocator</b>
+            </th>
+            <th [class.active]="order === 'tipoNI'" (click)="setOrder('tipoNI')" [hidden]="!config.actions.actionTipoNI">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tipoNI</b>
+            </th>
+            <th [class.active]="order === 'ruta'" (click)="setOrder('ruta')" [hidden]="!config.actions.actionRuta">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ruta</b>
+            </th>
+            <th [class.active]="order === 'tipoER'" (click)="setOrder('tipoER')" [hidden]="!config.actions.actionTipoER">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">tipoER</b>
+            </th>
+            <th [class.active]="order === 'noTicketReemiison'" (click)="setOrder('noTicketReemiison')" [hidden]="!config.actions.actionNoTicketReemiison">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">noTicketReemiison</b>
+            </th>
+            <th [class.active]="order === 'bspMontoTotal'" (click)="setOrder('bspMontoTotal')" [hidden]="!config.actions.actionBspMontoTotal">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspMontoTotal</b>
+            </th>
+            <th [class.active]="order === 'bspMontoContado'" (click)="setOrder('bspMontoContado')" [hidden]="!config.actions.actionBspMontoContado">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspMontoContado</b>
+            </th>
+            <th [class.active]="order === 'bspMontoCredito'" (click)="setOrder('bspMontoCredito')" [hidden]="!config.actions.actionBspMontoCredito">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspMontoCredito</b>
+            </th>
+            <th [class.active]="order === 'bspComisionPorcentaje'" (click)="setOrder('bspComisionPorcentaje')" [hidden]="!config.actions.actionBspComisionPorcentaje">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspComisionPorcentaje</b>
+            </th>
+            <th [class.active]="order === 'bspMontoComision'" (click)="setOrder('bspMontoComision')" [hidden]="!config.actions.actionBspMontoComision">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspMontoComision</b>
+            </th>
+            <th [class.active]="order === 'bspOverPorcentaje'" (click)="setOrder('bspOverPorcentaje')" [hidden]="!config.actions.actionBspOverPorcentaje">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspOverPorcentaje</b>
+            </th>
+            <th [class.active]="order === 'bspMontoOver'" (click)="setOrder('bspMontoOver')" [hidden]="!config.actions.actionBspMontoOver">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspMontoOver</b>
+            </th>
+            <th [class.active]="order === 'bspNetoAPagar'" (click)="setOrder('bspNetoAPagar')" [hidden]="!config.actions.actionBspNetoAPagar">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">bspNetoAPagar</b>
+            </th>
+            <th [class.active]="order === 'noVoucher'" (click)="setOrder('noVoucher')" [hidden]="!config.actions.actionNoVoucher">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">noVoucher</b>
+            </th>
+            <th [class.active]="order === 'fechaEmision'" (click)="setOrder('fechaEmision')" [hidden]="!config.actions.actionFechaEmision">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaEmision</b>
+            </th>
+            <th [class.active]="order === 'voucherMontoTotal'" (click)="setOrder('voucherMontoTotal')" [hidden]="!config.actions.actionVoucherMontoTotal">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">voucherMontoTotal</b>
+            </th>
+            <th [class.active]="order === 'voucherComisionPorcentaje'" (click)="setOrder('voucherComisionPorcentaje')" [hidden]="!config.actions.actionVoucherComisionPorcentaje">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">voucherComisionPorcentaje</b>
+            </th>
+            <th [class.active]="order === 'voucherMontoComision'" (click)="setOrder('voucherMontoComision')" [hidden]="!config.actions.actionVoucherMontoComision">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">voucherMontoComision</b>
+            </th>
+            <th [class.active]="order === 'voucherNetoAPagar'" (click)="setOrder('voucherNetoAPagar')" [hidden]="!config.actions.actionVoucherNetoAPagar">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">voucherNetoAPagar</b>
+            </th>
+            <th [class.active]="order === 'remark01'" (click)="setOrder('remark01')" [hidden]="!config.actions.actionRemark01">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark01</b>
+            </th>
+            <th [class.active]="order === 'remark02'" (click)="setOrder('remark02')" [hidden]="!config.actions.actionRemark02">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark02 </b>
+            </th>
+            <th [class.active]="order === 'remark03'" (click)="setOrder('remark03')" [hidden]="!config.actions.actionRemark03">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark03 </b>
+            </th>
+            <th [class.active]="order === 'remark04'" (click)="setOrder('remark04')" [hidden]="!config.actions.actionRemark04">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark04 </b>
+            </th>
+            <th [class.active]="order === 'remark05'" (click)="setOrder('remark05')" [hidden]="!config.actions.actionRemark05">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark05 </b>
+            </th>
+            <th [class.active]="order === 'remark06'" (click)="setOrder('remark06')" [hidden]="!config.actions.actionRemark06">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark06 </b>
+            </th>
+            <th [class.active]="order === 'remark07'" (click)="setOrder('remark07')" [hidden]="!config.actions.actionRemark07">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark07 </b>
+            </th>
+            <th [class.active]="order === 'remark08'" (click)="setOrder('remark08')" [hidden]="!config.actions.actionRemark08">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark08 </b>
+            </th>
+            <th [class.active]="order === 'remark09'" (click)="setOrder('remark09')" [hidden]="!config.actions.actionRemark09">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark09 </b>
+            </th>
+            <th [class.active]="order === 'remark10'" (click)="setOrder('remark10')" [hidden]="!config.actions.actionRemark10">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark10 </b>
+            </th>
+            <th [class.active]="order === 'remark11'" (click)="setOrder('remark11')" [hidden]="!config.actions.actionRemark11">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark11 </b>
+            </th>
+            <th [class.active]="order === 'remark12'" (click)="setOrder('remark12')" [hidden]="!config.actions.actionRemark12">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark12 </b>
+            </th>
+            <th [class.active]="order === 'remark13'" (click)="setOrder('remark13')" [hidden]="!config.actions.actionRemark13">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark13 </b>
+            </th>
+            <th [class.active]="order === 'remark14'" (click)="setOrder('remark14')" [hidden]="!config.actions.actionRemark14">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark14 </b>
+            </th>
+            <th [class.active]="order === 'remark15'" (click)="setOrder('remark15')" [hidden]="!config.actions.actionRemark15">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark15 </b>
+            </th>
+            <th [class.active]="order === 'remark16'" (click)="setOrder('remark16')" [hidden]="!config.actions.actionRemark16">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark16 </b>
+            </th>
+            <th [class.active]="order === 'remark17'" (click)="setOrder('remark17')" [hidden]="!config.actions.actionRemark17">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark17 </b>
+            </th>
+            <th [class.active]="order === 'remark18'" (click)="setOrder('remark18')" [hidden]="!config.actions.actionRemark18">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark18 </b>
+            </th>
+            <th [class.active]="order === 'remark19'" (click)="setOrder('remark19')" [hidden]="!config.actions.actionRemark19">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark19 </b>
+            </th>
+            <th [class.active]="order === 'remark20'" (click)="setOrder('remark20')" [hidden]="!config.actions.actionRemark20">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark20 </b>
+            </th>
+            <th [class.active]="order === 'remark21'" (click)="setOrder('remark21')" [hidden]="!config.actions.actionRemark21">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark21 </b>
+            </th>
+            <th [class.active]="order === 'remark22'" (click)="setOrder('remark22')" [hidden]="!config.actions.actionRemark22">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark22 </b>
+            </th>
+            <th [class.active]="order === 'remark23'" (click)="setOrder('remark23')" [hidden]="!config.actions.actionRemark23">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark23 </b>
+            </th>
+            <th [class.active]="order === 'remark24'" (click)="setOrder('remark24')" [hidden]="!config.actions.actionRemark24">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">remark24 </b>
+            </th>
+            <th [class.active]="order === 'TAA'" (click)="setOrder('TAA')" [hidden]="!config.actions.actionTaa">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TAA </b>
+            </th>
+            <th [class.active]="order === 'TAD'" (click)="setOrder('TAD')" [hidden]="!config.actions.actionTad">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TAD </b>
+            </th>
+            <th [class.active]="order === 'TBA'" (click)="setOrder('TBA')" [hidden]="!config.actions.actionTba">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TBA </b>
+            </th>
+            <th [class.active]="order === 'TBVP'" (click)="setOrder('TBVP')" [hidden]="!config.actions.actionTbvp">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TBVP </b>
+            </th>
+            <th [class.active]="order === 'TBD'" (click)="setOrder('TBD')" [hidden]="!config.actions.actionTbd">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">TBD </b>
+            </th>
+            <th [class.active]="order === 'ahorro'" (click)="setOrder('ahorro')" [hidden]="!config.actions.actionAhorro">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ahorro </b>
+            </th>
+            <th [class.active]="order === 'anticipacion'" (click)="setOrder('anticipacion')" [hidden]="!config.actions.actionAnticipacion">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">anticipacion </b>
+            </th>
+            <th [class.active]="order === 'auditor'" (click)="setOrder('auditor')" [hidden]="!config.actions.actionAuditor">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">auditor </b>
+            </th>
+            <th [class.active]="order === 'booking'" (click)="setOrder('booking')" [hidden]="!config.actions.actionBooking">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">booking </b>
+            </th>
+            <th [class.active]="order === 'ciudadOrigen'" (click)="setOrder('ciudadOrigen')" [hidden]="!config.actions.actionCiudadOrigen">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ciudadOrigen </b>
+            </th>
+            <th [class.active]="order === 'paisOrigen'" (click)="setOrder('paisOrigen')" [hidden]="!config.actions.actionPaisOrigen">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">paisOrigen </b>
+            </th>
+            <th [class.active]="order === 'ciudadDestino'" (click)="setOrder('ciudadDestino')" [hidden]="!config.actions.actionCiudadDestino">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">ciudadDestino </b>
+            </th>
+            <th [class.active]="order === 'paisDestino'" (click)="setOrder('paisDestino')" [hidden]="!config.actions.actionPaisDestino">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">paisDestino </b>
+            </th>
+            <th [class.active]="order === 'clases'" (click)="setOrder('clases')" [hidden]="!config.actions.actionClases">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">clases </b>
+            </th>
+            <th [class.active]="order === 'codigoIT'" (click)="setOrder('codigoIT')" [hidden]="!config.actions.actionCodigoIT">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">codigoIT </b>
+            </th>
+            <th [class.active]="order === 'fechaRegreso'" (click)="setOrder('fechaRegreso')" [hidden]="!config.actions.actionFechaRegreso">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaRegreso </b>
+            </th>
+            <th [class.active]="order === 'fechaSalida'" (click)="setOrder('fechaSalida')" [hidden]="!config.actions.actionFechaSalida">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fechaSalida </b>
+            </th>
+            <th [class.active]="order === 'horaSalida'" (click)="setOrder('horaSalida')" [hidden]="!config.actions.actionHoraSalida">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">horaSalida </b>
+            </th>
+            <th [class.active]="order === 'numeroNoches'" (click)="setOrder('numeroNoches')" [hidden]="!config.actions.actionNumeroNoches">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">numeroNoches </b>
+            </th>
+            <th [class.active]="order === 'fareBasis'" (click)="setOrder('fareBasis')" [hidden]="!config.actions.actionFareBasis">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">fareBasis </b>
+            </th>
+            <th [class.active]="order === 'totalGasto'" (click)="setOrder('totalGasto')" [hidden]="!config.actions.actionTotalGasto">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">totalGasto </b>
+            </th>
+            <th [class.active]="order === 'totalTarifa'" (click)="setOrder('totalTarifa')" [hidden]="!config.actions.actionTotalTarifa">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">totalTarifa </b>
+            </th>
+            <th [class.active]="order === 'IdClieCliente'" (click)="setOrder('IdClieCliente')" [hidden]="!config.actions.actionIdClieCliente">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdClieCliente </b>
+            </th>
+            <th [class.active]="order === 'IdMaeSucursal'" (click)="setOrder('IdMaeSucursal')" [hidden]="!config.actions.actionIdMaeSucursal">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdMaeSucursal </b>
+            </th>
+            <th [class.active]="order === 'IdProdSubProducto'" (click)="setOrder('IdProdSubProducto')" [hidden]="!config.actions.actionIdProdSubProducto">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdProdSubProducto </b>
+            </th>
+            <th [class.active]="order === 'IdProvProveedores'" (click)="setOrder('IdProvProveedores')" [hidden]="!config.actions.actionIdProvProveedores">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdProvProveedores </b>
+            </th>
+            <th [class.active]="order === 'IdSegUsuarioCreacion'" (click)="setOrder('IdSegUsuarioCreacion')" [hidden]="!config.actions.actionIdSegUsuarioCreacion">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdSegUsuarioCreacion </b>
+            </th>
+            <th [class.active]="order === 'IdVendVendedora'" (click)="setOrder('IdVendVendedora')" [hidden]="!config.actions.actionIdVendVendedora">
+              <span [hidden]="reverse">▼</span>
+              <span [hidden]="!reverse">▲</span>
+              <b class="lbHead">IdVendVendedora </b>
+            </th>
+
+
+          </tr>
+        </thead>
+        <tbody>
+          <!--tr *ngFor="let tab of tabla" (onCreate)="saveFilters(tab)"-->
+          <tr *ngFor="let tab of tabla | orderBy: order:reverse:'case-insensitive'">
+            <th [hidden]="!config.actions.actionIdVentaNegocio">{{tab.idVentaNegocio}}</th>
+            <th [hidden]="!config.actions.actionSucursal">{{tab.sucursal}}</th>
+            <th [hidden]="!config.actions.actionEstadoNegocio">{{tab.estadoNegocio}}</th>
+            <th [hidden]="!config.actions.actionTipoNegocio">{{tab.tipoNegocio}}</th>
+            <th [hidden]="!config.actions.actionLineaNegocio">{{tab.lineaNegocio}}</th>
+            <th [hidden]="!config.actions.actionVendedora">{{tab.vendedora}}</th>
+            <th [hidden]="!config.actions.actionCliente">{{tab.cliente}}</th>
+            <th [hidden]="!config.actions.actionFechaCreacion">{{tab.fechaCreacion}}</th>
+            <th [hidden]="!config.actions.actionCerrado">{{tab.cerrado}}</th>
+            <th [hidden]="!config.actions.actionIdVentaNegocioDetalle">{{tab.idVentaNegocioDetalle}}</th>
+            <th [hidden]="!config.actions.actionEstadoLinea">{{tab.estadoLinea}}</th>
+            <th [hidden]="!config.actions.actionInterfaz">{{tab.interfaz}}</th>
+            <th [hidden]="!config.actions.actionTipoInterfaz">{{tab.tipoInterfaz}}</th>
+            <th [hidden]="!config.actions.actionSunProducto">{{tab.sunProducto}}</th>
+            <th [hidden]="!config.actions.actionProveedor">{{tab.proveedor}}</th>
+            <th [hidden]="!config.actions.actionServicio">{{tab.servicio}}</th>
+            <th [hidden]="!config.actions.actionNombrePasajero">{{tab.nombrePasajero}}</th>
+            <th [hidden]="!config.actions.actionMoneda">{{tab.moneda}}</th>
+            <th [hidden]="!config.actions.actionTipoCambio">{{tab.tipoCambio}}</th>
+            <th [hidden]="!config.actions.actionMontoVenta">{{tab.montoVenta}}</th>
+            <th [hidden]="!config.actions.actionMontoTax">{{tab.montoTax}}</th>
+            <th [hidden]="!config.actions.actionMontoTotal">{{tab.montoTotal}}</th>
+            <th [hidden]="!config.actions.actionComision">{{tab.comision}}</th>
+            <th [hidden]="!config.actions.actionComisionIva">{{tab.comisionIva}}</th>
+            <th [hidden]="!config.actions.actionMontoCosto">{{tab.montoCosto}}</th>
+            <th [hidden]="!config.actions.actionDescuento">{{tab.descuento}}</th>
+            <th [hidden]="!config.actions.actionMontoDescuento">{{tab.montoDescuento}}</th>
+            <th [hidden]="!config.actions.actionIva">{{tab.iva}}</th>
+            <th [hidden]="!config.actions.actionMontoIva">{{tab.montoIva}}</th>
+            <th [hidden]="!config.actions.actionMontoFee">{{tab.montoFee}}</th>
+            <th [hidden]="!config.actions.actionMontoMargen">{{tab.montoMargen}}</th>
+            <th [hidden]="!config.actions.actionMontoFeeOculto">{{tab.montoFeeOculto}}</th>
+            <th [hidden]="!config.actions.actionMontoMargenRiesgo">{{tab.montoMargenRiesgo}}</th>
+            <th [hidden]="!config.actions.actionMontoVentaCLP">{{tab.montoVentaCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoTaxCLP">{{tab.montoTaxCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoTotalCLP">{{tab.montoTotalCLP}}</th>
+            <th [hidden]="!config.actions.actionComisionCLP">{{tab.comisionCLP}}</th>
+            <th [hidden]="!config.actions.actionComisionIvaCLP">{{tab.comisionIvaCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoCostoCLP">{{tab.montoCostoCLP}}</th>
+            <th [hidden]="!config.actions.actionDescuentoCLP">{{tab.descuentoCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoDescuentoCLP">{{tab.montoDescuentoCLP}}</th>
+            <th [hidden]="!config.actions.actionNombreDescuentoCLP">{{tab.nombreDescuentoCLP}}</th>
+            <th [hidden]="!config.actions.actionIvaCLP">{{tab.ivaCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoIvaCLP">{{tab.montoIvaCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoFeeCLP">{{tab.montoFeeCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoMargenCLP">{{tab.montoMargenCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoFeeOcultoCLP">{{tab.montoFeeOcultoCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoMargenRiesgoCLP">{{tab.montoMargenRiesgoCLP}}</th>
+            <th [hidden]="!config.actions.actionMontoVentaUSD">{{tab.montoVentaUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoTaxUSD">{{tab.montoTaxUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoTotalUSD">{{tab.montoTotalUSD}}</th>
+            <th [hidden]="!config.actions.actionComisionUSD">{{tab.comisionUSD}}</th>
+            <th [hidden]="!config.actions.actionComisionIvaUSD">{{tab.comisionIvaUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoCostoUSD">{{tab.montoCostoUSD}}</th>
+            <th [hidden]="!config.actions.actionDescuentoUSD">{{tab.descuentoUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoDescuentoUSD">{{tab.montoDescuentoUSD}}</th>
+            <th [hidden]="!config.actions.actionIvaUSD">{{tab.ivaUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoIvaUSD">{{tab.montoIvaUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoFeeUSD">{{tab.montoFeeUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoMargenUSD">{{tab.montoMargenUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoFeeOcultoUSD">{{tab.montoFeeOcultoUSD}}</th>
+            <th [hidden]="!config.actions.actionMontoMargenRiesgoUSD">{{tab.montoMargenRiesgoUSD}}</th>
+            <th [hidden]="!config.actions.actionFechaViajeDesde">{{tab.fechaViajeDesde}}</th>
+            <th [hidden]="!config.actions.actionFechaViajeHasta">{{tab.fechaViajeHasta}}</th>
+            <th [hidden]="!config.actions.actionFechaFacturaLinea">{{tab.fechaFacturaLinea}}</th>
+            <th [hidden]="!config.actions.actionNoFacturaLinea">{{tab.noFacturaLinea}}</th>
+            <th [hidden]="!config.actions.actionMontoFacturadoLinea">{{tab.montoFacturadoLinea}}</th>
+            <th [hidden]="!config.actions.actionImpuestoFacturadoLinea">{{tab.impuestoFacturadoLinea}}</th>
+            <th [hidden]="!config.actions.actionInferfaz">{{tab.inferfaz}}</th>
+            <th [hidden]="!config.actions.actionIata">{{tab.iata}}</th>
+            <th [hidden]="!config.actions.actionProveedorBsp">{{tab.proveedorBsp}}</th>
+            <th [hidden]="!config.actions.actionTipoPago">{{tab.tipoPago}}</th>
+            <th [hidden]="!config.actions.actionTarjetaCredito">{{tab.tarjetaCredito}}</th>
+            <th [hidden]="!config.actions.actionNoTarjetaCredito">{{tab.NoTarjetaCredito}}</th>
+            <th [hidden]="!config.actions.actionNoTicket">{{tab.noTicket}}</th>
+            <th [hidden]="!config.actions.actionPnrLocator">{{tab.pnrLocator}}</th>
+            <th [hidden]="!config.actions.actionTipoNI">{{tab.tipoNI}}</th>
+            <th [hidden]="!config.actions.actionRuta">{{tab.ruta}}</th>
+            <th [hidden]="!config.actions.actionTipoER">{{tab.tipoER}}</th>
+            <th [hidden]="!config.actions.actionNoTicketReemiison">{{tab.noTicketReemiison}}</th>
+            <th [hidden]="!config.actions.actionBspMontoTotal">{{tab.bspMontoTotal}}</th>
+            <th [hidden]="!config.actions.actionBspMontoContado">{{tab.bspMontoContado}}</th>
+            <th [hidden]="!config.actions.actionBspMontoCredito">{{tab.bspMontoCredito}}</th>
+            <th [hidden]="!config.actions.actionBspComisionPorcentaje">{{tab.bspComisionPorcentaje}}</th>
+            <th [hidden]="!config.actions.actionBspMontoComision">{{tab.bspMontoComision}}</th>
+            <th [hidden]="!config.actions.actionBspOverPorcentaje">{{tab.bspOverPorcentaje}}</th>
+            <th [hidden]="!config.actions.actionBspMontoOver">{{tab.bspMontoOver}}</th>
+            <th [hidden]="!config.actions.actionBspNetoAPagar">{{tab.bspNetoAPagar}}</th>
+            <th [hidden]="!config.actions.actionNoVoucher">{{tab.noVoucher}}</th>
+            <th [hidden]="!config.actions.actionFechaEmision">{{tab.fechaEmision}}</th>
+            <th [hidden]="!config.actions.actionVoucherMontoTotal">{{tab.voucherMontoTotal}}</th>
+            <th [hidden]="!config.actions.actionVoucherComisionPorcentaje">{{tab.voucherComisionPorcentaje}}</th>
+            <th [hidden]="!config.actions.actionVoucherMontoComision">{{tab.voucherMontoComision}}</th>
+            <th [hidden]="!config.actions.actionVoucherNetoAPagar">{{tab.voucherNetoAPagar}}</th>
+            <th [hidden]="!config.actions.actionRemark01">{{tab.remark01}}</th>
+            <th [hidden]="!config.actions.actionRemark02">{{tab.remark02}}</th>
+            <th [hidden]="!config.actions.actionRemark03">{{tab.remark03}}</th>
+            <th [hidden]="!config.actions.actionRemark04">{{tab.remark04}}</th>
+            <th [hidden]="!config.actions.actionRemark05">{{tab.remark05}}</th>
+            <th [hidden]="!config.actions.actionRemark06">{{tab.remark06}}</th>
+            <th [hidden]="!config.actions.actionRemark07">{{tab.remark07}}</th>
+            <th [hidden]="!config.actions.actionRemark08">{{tab.remark08}}</th>
+            <th [hidden]="!config.actions.actionRemark09">{{tab.remark09}}</th>
+            <th [hidden]="!config.actions.actionRemark10">{{tab.remark10}}</th>
+            <th [hidden]="!config.actions.actionRemark11">{{tab.remark11}}</th>
+            <th [hidden]="!config.actions.actionRemark12">{{tab.remark12}}</th>
+            <th [hidden]="!config.actions.actionRemark13">{{tab.remark13}}</th>
+            <th [hidden]="!config.actions.actionRemark14">{{tab.remark14}}</th>
+            <th [hidden]="!config.actions.actionRemark15">{{tab.remark15}}</th>
+            <th [hidden]="!config.actions.actionRemark16">{{tab.remark16}}</th>
+            <th [hidden]="!config.actions.actionRemark17">{{tab.remark17}}</th>
+            <th [hidden]="!config.actions.actionRemark18">{{tab.remark18}}</th>
+            <th [hidden]="!config.actions.actionRemark19">{{tab.remark19}}</th>
+            <th [hidden]="!config.actions.actionRemark20">{{tab.remark20}}</th>
+            <th [hidden]="!config.actions.actionRemark21">{{tab.remark21}}</th>
+            <th [hidden]="!config.actions.actionRemark22">{{tab.remark22}}</th>
+            <th [hidden]="!config.actions.actionRemark23">{{tab.remark23}}</th>
+            <th [hidden]="!config.actions.actionRemark24">{{tab.remark24}}</th>
+            <th [hidden]="!config.actions.actionTaa">{{tab.taa}}</th>
+            <th [hidden]="!config.actions.actionTad">{{tab.tad}}</th>
+            <th [hidden]="!config.actions.actionTba">{{tab.tba}}</th>
+            <th [hidden]="!config.actions.actionTbvp">{{tab.tvbp}}</th>
+            <th [hidden]="!config.actions.actionTbd">{{tab.tbd}}</th>
+            <th [hidden]="!config.actions.actionAhorro">{{tab.ahorro}}</th>
+            <th [hidden]="!config.actions.actionAnticipacion">{{tab.anticipacion}}</th>
+            <th [hidden]="!config.actions.actionAuditor">{{tab.auditor}}</th>
+            <th [hidden]="!config.actions.actionBooking">{{tab.booking}}</th>
+            <th [hidden]="!config.actions.actionCiudadOrigen">{{tab.ciudadOrigen}}</th>
+            <th [hidden]="!config.actions.actionPaisOrigen">{{tab.paisOrigen}}</th>
+            <th [hidden]="!config.actions.actionCiudadDestino">{{tab.ciudadDestino}}</th>
+            <th [hidden]="!config.actions.actionPaisDestino">{{tab.paisDestino}}</th>
+            <th [hidden]="!config.actions.actionClases">{{tab.clases}}</th>
+            <th [hidden]="!config.actions.actionCodigoIT">{{tab.codigoIT}}</th>
+            <th [hidden]="!config.actions.actionFechaRegreso">{{tab.fechaRegreso}}</th>
+            <th [hidden]="!config.actions.actionFechaSalida">{{tab.fechaSalida}}</th>
+            <th [hidden]="!config.actions.actionHoraSalida">{{tab.horaSalida}}</th>
+            <th [hidden]="!config.actions.actionNumeroNoches">{{tab.numeroNoches}}</th>
+            <th [hidden]="!config.actions.actionFareBasis">{{tab.fareBasis}}</th>
+            <th [hidden]="!config.actions.actionTotalGasto">{{tab.totalGasto}}</th>
+            <th [hidden]="!config.actions.actionTotalTarifa">{{tab.totalTarifa}}</th>
+            <th [hidden]="!config.actions.actionIdClieCliente">{{tab.idClieCliente}}</th>
+            <th [hidden]="!config.actions.actionIdMaeSucursal">{{tab.idMaeSucursal}}</th>
+            <th [hidden]="!config.actions.actionIdProdSubProducto">{{tab.idProdSubProducto}}</th>
+            <th [hidden]="!config.actions.actionIdProvProveedores">{{tab.idProvProveedores}}</th>
+            <th [hidden]="!config.actions.actionIdSegUsuarioCreacion">{{tab.idSegUsuarioCreacion}}</th>
+            <th [hidden]="!config.actions.actionIdVendVendedora">{{tab.idVendVendedora}}</th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--FIN GRILLA-->
+
+<!-- Modal -->
+<div class="modal fade" [ngClass]="{'show':true }" id="modalAdvertencia" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar Reporte</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ¿Esta seguro que desea eliminar el reporte {{txtNombreReporte}}?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal"  (click)="onDeleteTipoReporte()">Eliminar Reporte</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--FIN MODAL-->
